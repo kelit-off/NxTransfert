@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('transfers', function (Blueprint $table) {
             $table->id();
+            $table->uuid('token')->unique();
+            $table->json("files");
+            $table->text("message")->nullable();
+            $table->timestamp("expire_at")->nullable();
             $table->timestamps();
         });
     }
