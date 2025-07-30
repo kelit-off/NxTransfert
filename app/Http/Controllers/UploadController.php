@@ -46,7 +46,7 @@ class UploadController extends Controller
 
         $zipContents = file_get_contents($tempZipPath);
 
-        // Storage::disk("s3")->put($token.".zip", $zipContents);
+        Storage::disk("s3")->put($token.".zip", $zipContents);
 
         unlink($tempZipPath);
 

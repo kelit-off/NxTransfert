@@ -69,7 +69,7 @@ export default function Upload() {
         })
     }
 
-    const newTransfert = async () => {
+    const newTransfert = () => {
         setFiles([])
         setUrlDownload(null)
         setMessage("")
