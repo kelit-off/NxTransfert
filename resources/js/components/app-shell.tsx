@@ -10,7 +10,18 @@ interface AppShellProps {
 
 
 const backgroundImages = [
-    'https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    {
+        path_image: "/asset/img/montagne.jpg",
+        comp: 'Photo de <a href="https://unsplash.com/fr/@v2osk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">v2osk</a> sur <a href="https://unsplash.com/fr/photos/foggy-mountain-summit-1Z2niiBPg5A?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+    },
+    {
+        path_image: "/asset/img/foret.jpg",
+        comp: 'Photo de <a href="https://unsplash.com/fr/@szmigieldesign?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Lukasz Szmigiel</a> sur <a href="https://unsplash.com/fr/photos/arbres-de-la-foret-jFCViYFYcus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+    },
+    {
+        path_image: "/asset/img/neige.jpg",
+        comp: 'Photo de <a href="https://unsplash.com/fr/@jmsdono?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">jms</a> sur <a href="https://unsplash.com/fr/photos/photo-de-montagnes-et-darbres-kFHz9Xh3PPU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+    }
 ]
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
@@ -19,7 +30,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
 
     useEffect(() => {
         const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-        setBackgroundImage(backgroundImages[randomIndex]);
+        setBackgroundImage(backgroundImages[randomIndex].path_image);
     }, []);
 
     if (variant === 'header') {
