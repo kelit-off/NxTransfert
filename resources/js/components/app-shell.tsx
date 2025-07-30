@@ -28,10 +28,30 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
     const [backgroundImage, setBackgroundImage] = useState("")
 
+
+    const preloadImage = (src) =>
+    new Promise((resolve) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = resolve;
+    });
     useEffect(() => {
-        const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-        setBackgroundImage(backgroundImages[randomIndex].path_image);
-    }, []);
+        backgroundImages.forEach(img => preloadImage(img.path_image));
+        // fonction qui change l'image
+        const changeImage = () => {
+            const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+            setBackgroundImage(backgroundImages[randomIndex].path_image);
+        };
+
+        // première image au montage
+        changeImage();
+
+        // changement toutes les 10s
+        const interval = setInterval(changeImage, 10000);
+
+        // nettoyage
+        return () => clearInterval(interval);
+    }, [backgroundImages]);
 
     if (variant === 'header') {
         return (

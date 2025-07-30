@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import axios from "axios";
 import { CopyIcon, FileCheck, FileIcon, X } from "lucide-react";
 import { use, useEffect, useRef, useState } from "react";
+import { text } from "stream/consumers";
 
 export default function Upload() {
     const [files, setFiles] = useState([])
@@ -80,22 +81,43 @@ export default function Upload() {
     }
 
     const copyUrl = (e) => {
-        navigator.clipboard.writeText(urlDownload)
-        setShow(true)
+        if(navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(urlDownload)
+            setShow(true)
+        } else {
+            const textarea = document.createElement("textarea");
+            textarea.value = urlDownload
+            textarea.style.position = "fixed"
+            document.body.appendChild(textarea)
+            textarea.focus()
+            textarea.select()
+            document.execCommand("copy");
+            document.body.removeChild(textarea)
+            setShow(true)
+        }
     }
 
     return (
         <AppShell>
-            <AppPopup background={'bg-green-400'} message={"Copier avec succès"} show={show} />
+            <AppPopup background={'bg-green-400'} message={"Copier avec succès"} show={show} onClose={() => setShow(false)}/>
             <div className="bg-black/60 border border-white rounded-2xl min-h-86 px-4 pb-4 w-fit min-w-86 flex flex-col">
                 <div className="py-5 px-10 text-white">
                     {/* Titre du projet et projet mère */}
                     <h1>NxTransfert</h1>
                 </div>
                 <div className="rounded-md bg-white text-center flex-1 flex">
-                    {!hasAttemptedUpload ? (
+                    {loading ? (
+                        <div className="flex flex-col flex-1 items-center justify-center space-y-2">
+                            <div className="flex space-x-1">
+                                <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce"></div>
+                                <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+                                <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce [animation-delay:-0.4s]"></div>
+                            </div>
+                            <span className="text-sm text-gray-600">Envoi en cours...</span>
+                        </div>
+                    ) : !hasAttemptedUpload ? (
                         <div className="flex flex-col flex-1 justify-center">
-                            <div className="flex justify-center">
+                            <div className="flex justify-center mb-2">
                                 <label htmlFor="input_file" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center">
                                     <img className="w-[25px] h-auto" src="/asset/svg/icon-plus.svg" alt="" />
                                 </label>

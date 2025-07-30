@@ -31,10 +31,15 @@
         </style>
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <meta name="description" content="NxTransfert est un service français pour envoyer des fichiers volumineux : rapide, sécurisé et responsable.">
+        <base href="/">
+
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ config('app.url') }}">
+        <meta property="og:title" content="NxTransfert | Envoi de gros fichiers – Rapide, Sécurisé, Français">
+        <meta property="og:description" content="NxTransfert est un service français pour envoyer des fichiers volumineux : rapide, sécurisé et responsable.">
 
         <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />

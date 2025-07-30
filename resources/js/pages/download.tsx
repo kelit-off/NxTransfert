@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { SharedData } from "@/types";
-import { usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { FileIcon } from "lucide-react";
 
