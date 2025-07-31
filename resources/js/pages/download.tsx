@@ -3,11 +3,14 @@ import { SharedData } from "@/types";
 import { Head, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { FileIcon } from "lucide-react";
+import { useState } from "react";
 
 export default function Download() {
     const { files, token } = usePage<SharedData>().props
+    const [isDownload, setIsDownload] = useState(false)
     
     const handleDownload = async (e) => {
+        setIsDownload(true)
 
         const formData = new FormData();
         formData.append("token", token)
@@ -19,8 +22,9 @@ export default function Download() {
                 a.href = reponse.data.download_url
                 a.download = "archive_"+new Date().toISOString().split("T")[0]
                 document.body.appendChild(a)
-                a.click()
+                // a.click()
                 a.remove()
+                // setIsDownload(false)
             }
         })
     }
@@ -48,9 +52,9 @@ export default function Download() {
                     </div>
                     {/* Signalement */}
                     {/* Bouton pour télécharger */}
-                    <button className="bg-green-500 rounded py-1 text-white cursor-pointer" onClick={handleDownload}>Télécharger</button>
+                    <button className="bg-green-500 rounded py-1 text-white cursor-pointer disabled:cursor-not-allowed disabled:bg-green-500/70" onClick={handleDownload} disabled={isDownload}>{(isDownload ? "Téléchargement en cours" : "Télécharger")}</button>
                 </div>
             </div>
         </AppShell>
     )
-}
+} 

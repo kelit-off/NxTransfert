@@ -17,15 +17,34 @@ export default function Upload() {
 
     useEffect(() => {
         if (inputRef.current) {
-        inputRef.current.setAttribute("webkitdirectory", "");
-        inputRef.current.setAttribute("directory", "");
+            inputRef.current.setAttribute("webkitdirectory", "");
+            inputRef.current.setAttribute("directory", "");
         }
     }, []);
 
     const changeFile = (e) => {
-        setHasAttemptedUpload(true)
+        setHasAttemptedUpload(true);
         const selectedFiles = Array.from(e.target.files || []);
-        setFiles(selectedFiles)
+        
+        if (selectedFiles.length > 0) {
+            setFiles(prevFiles => {
+                // Créer un Set des noms de fichiers existants pour éviter les doublons
+                const existingFileNames = new Set(prevFiles.map(file => file.name));
+                
+                // Filtrer les nouveaux fichiers pour éviter les doublons
+                const newFiles = selectedFiles.filter(file => !existingFileNames.has(file.name));
+                
+                // Retourner l'array combiné : anciens fichiers + nouveaux fichiers
+                return [...prevFiles, ...newFiles];
+            });
+        }
+        
+        // Réinitialiser la valeur de l'input pour permettre de sélectionner le même fichier à nouveau
+        e.target.value = '';
+    }
+
+    const removeFile = (index) => {
+        
     }
 
     const changeMessage = (e) => {
@@ -34,7 +53,6 @@ export default function Upload() {
 
     const handleUpload = async (e) => {
         setLoading(true)
-        console.log(e)
         const formData = new FormData();
         files.forEach((file, index) => {
             formData.append('files[]', file);
@@ -46,7 +64,6 @@ export default function Upload() {
             if(reponse.data.status == "success") {
                 setUrlDownload(reponse.data.url)
                 const date = new Date(reponse.data.date_expiration)
-                console.log(date)
                 const formatted = new Intl.DateTimeFormat('fr-FR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -55,10 +72,9 @@ export default function Upload() {
                     minute: '2-digit',
                     hour12: false
                 }).format(date)
-                console.log(formatted)
+                
                 const [datePart, timePart] = formatted.split(' ');
-                console.log(date)
-                console.log(timePart)
+                
                 setExpiration({date: datePart, heure: timePart})
             }
         })
@@ -118,19 +134,19 @@ export default function Upload() {
                     ) : !hasAttemptedUpload ? (
                         <div className="flex flex-col flex-1 justify-center">
                             <div className="flex justify-center mb-2">
-                                <label htmlFor="input_file" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center">
+                                <label htmlFor="initial_input_file" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center">
                                     <img className="w-[25px] h-auto" src="/asset/svg/icon-plus.svg" alt="" />
                                 </label>
                                 <span className="hidden">Ajouter un fichier</span>
                             </div>
                         
-                            <input type="file" name="input_file" id="input_file" className="hidden" multiple onChange={changeFile}/>
+                            <input type="file" name="initial_input_file" id="initial_input_file" className="hidden" multiple onChange={changeFile}/>
                             <p className="text-lg font-semibold text-black">
                                 Cliquez pour ajouter vos fichiers
                             </p>
                             <p className="mt-0.5 text-sm text-gray-400">
-                                <label htmlFor="input_directory" className="hover:underline cursor-pointer text-green-400 font-semibold hover:text-green-500">Ajouter un dossier</label>
-                                <input type="file" name="input_directory" id="input_directory" className="hidden" ref={inputRef} onChange={changeFile}/>
+                                <label htmlFor="initial_input_directory" className="hover:underline cursor-pointer text-green-400 font-semibold hover:text-green-500">Ajouter un dossier</label>
+                                <input type="file" name="initial_input_directory" id="initial_input_directory" className="hidden" webkitdirectory="" directory="" onChange={changeFile}/>
                             </p>
                         </div>
                     ) : urlDownload != null ? (
@@ -172,7 +188,7 @@ export default function Upload() {
                                                         <span className="text-sm">{file.name}</span>
                                                     </div>
                                                 </div>
-                                                <button className="cursor-pointer">
+                                                <button className="cursor-pointer" onClick={removeFile(index)}>
                                                     <X />
                                                 </button>
                                             </div>
@@ -181,15 +197,15 @@ export default function Upload() {
                                 </div>
                                 <div className="flex flex-row justify-left py-5">
                                     {/* Ajouter des fichier ou dossier*/}
-                                    <label htmlFor="input_file" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center mr-3">
+                                    <label htmlFor="additional_file_input" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center mr-3">
                                         <img className="w-[25px] h-auto" src="/asset/svg/icon-plus.svg" alt="" />
                                     </label>
-                                    <input type="file" name="input_file" id="input_file" className="hidden" multiple onChange={changeFile}/>
+                                    <input type="file" name="additional_file_input" id="additional_file_input" className="hidden" multiple onChange={changeFile}/>
                                     <div>
                                         <label htmlFor="input_file" className="cursor-pointer">Ajoutez vos fichiers</label>
                                         <p className="mt-0.5 text-sm text-gray-400">
-                                            <label htmlFor="input_directory" className="hover:underline cursor-pointer text-green-400 font-semibold hover:text-green-500">Ajouter un dossier</label>
-                                            <input type="file" name="input_directory" id="input_directory" className="hidden" ref={inputRef} onChange={changeFile}/>
+                                            <label htmlFor="additional_directory_input" className="hover:underline cursor-pointer text-green-400 font-semibold hover:text-green-500">Ajouter un dossier</label>
+                                            <input type="file" name="additional_directory_input" id="additional_directory_input" className="hidden" webkitdirectory="" directory="" multiple onChange={changeFile}/>
                                         </p>
                                     </div>
                                 </div>

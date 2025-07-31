@@ -2,6 +2,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import AppModal from './app-modal';
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -56,10 +57,14 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     if (variant === 'header') {
         return (
             <div className="flex min-h-screen w-full flex-col" style={{backgroundImage: `url(${backgroundImage})`,backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                <div className="flex-1 flex items-center justify-center">
-                    {children}
+                <div className='flex flex-1 flex-col'>
+                    <div className="flex-1 flex items-center justify-center">
+                        {children}
+                    </div>
                 </div>
-
+                {/* <AppModal>
+                    test
+                </AppModal> */}
                 {/* Footer en bas de la page */}
                 <div className="flex flex-col md:flex-row justify-between px-4 py-6 text-white">
                     <div>
@@ -69,10 +74,10 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
                         {/* Langue, information général sur le projet */}
                         <div>
                             <h1 className="text-base font-semibold">L'alternative à WeTransfer français</h1>
-                            <div className="space-x-2">
+                            {/* <div className="space-x-2">
                                 <a className="cursor-pointer" href="#">Partager <span className='underline'>vos idées</span> avec nous</a>
                                 <a className="cursor-pointer" href="#">ou <span className='underline'>votre satisfaction</span></a>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
