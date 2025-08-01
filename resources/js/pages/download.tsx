@@ -6,9 +6,10 @@ import { FileIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function Download() {
-    const { files, token } = usePage<SharedData>().props
+    const { files, message, token } = usePage<SharedData>().props
     const [isDownload, setIsDownload] = useState(false)
     
+    console.log(message)
     const handleDownload = async (e) => {
         setIsDownload(true)
 
@@ -37,6 +38,7 @@ export default function Download() {
                     <h1>NxTransfert</h1>
                 </div>
                 <div className="rounded-md bg-white text-center flex-col flex-1 flex px-5 py-2">
+                    <p className="text-sm text-left text-gray-600 mb-1">{message}</p>
                     <p className="text-sm text-[#666]">Ces fichier seront supprimés dans 30 jours.</p>
                     <div className="flex flex-1 flex-col overflow-y-auto">
                         {files.map((file, index) => {

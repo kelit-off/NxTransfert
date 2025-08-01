@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import AppModal from './app-modal';
 import { FaDiscord } from "react-icons/fa";
+import { IoSend } from "react-icons/io5";
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -62,6 +63,10 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
         return () => clearInterval(interval);
     }, [backgroundImages]);
 
+    const handleIdee = () => {
+
+    }
+
     if (variant === 'header') {
         return (
             <div className="flex min-h-screen w-full flex-col" style={{backgroundImage: `url(${backgroundImage})`,backgroundSize: 'cover', backgroundPosition: 'center'}}>
@@ -75,9 +80,14 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
                         })}
                     </div>
                 </div>
-                {/* <AppModal>
-                    test
-                </AppModal> */}
+                <AppModal addButton={
+                    <button className='cursor-pointer' onClick={handleIdee}><IoSend /></button>
+                }>
+                    <div className='py-2 px-3'>
+                        <h4>Partager vos idées</h4>
+                        <textarea name="" id=""></textarea>
+                    </div>
+                </AppModal>
                 {/* Footer en bas de la page */}
                 <div className="flex flex-col md:flex-row justify-between px-4 py-6 text-white">
                     <div>

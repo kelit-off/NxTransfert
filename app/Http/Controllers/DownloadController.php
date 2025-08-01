@@ -14,6 +14,7 @@ class DownloadController extends Controller
 
         return Inertia::render('download', [
             "files" => $TransferInfo->files,
+            'message' => $TransferInfo->message,
             "token" => $token
         ]);
     }
