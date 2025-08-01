@@ -16,6 +16,8 @@
                         document.documentElement.classList.add('');
                     }
                 }
+
+                document.documentElement.classList.remove('dark');
             })();
         </script>
 
