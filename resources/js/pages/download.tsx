@@ -22,9 +22,9 @@ export default function Download() {
                 a.href = reponse.data.download_url
                 a.download = "archive_"+new Date().toISOString().split("T")[0]
                 document.body.appendChild(a)
-                // a.click()
+                a.click()
                 a.remove()
-                // setIsDownload(false)
+                setIsDownload(false)
             }
         })
     }

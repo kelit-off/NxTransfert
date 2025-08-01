@@ -3,6 +3,7 @@ import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import AppModal from './app-modal';
+import { FaDiscord } from "react-icons/fa";
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -22,6 +23,13 @@ const backgroundImages = [
     {
         path_image: "/asset/img/neige.jpg",
         comp: 'Photo de <a href="https://unsplash.com/fr/@jmsdono?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">jms</a> sur <a href="https://unsplash.com/fr/photos/photo-de-montagnes-et-darbres-kFHz9Xh3PPU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+    }
+]
+
+const nosReseau = [
+    {
+        url: "https://discord.gg/wNeFaayTNV",
+        icon: <FaDiscord />
     }
 ]
 
@@ -57,9 +65,14 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     if (variant === 'header') {
         return (
             <div className="flex min-h-screen w-full flex-col" style={{backgroundImage: `url(${backgroundImage})`,backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                <div className='flex flex-1 flex-col'>
-                    <div className="flex-1 flex items-center justify-center">
-                        {children}
+                <div className="flex-1 flex flex-col items-center justify-center">
+                    {children}
+                    <div className="flex flex-row justify-between mt-3">
+                        {nosReseau.map((reseau, index) => {
+                            return (
+                                <a href={reseau.url} key={index} className='text-white text-2xl' target='_blank'>{reseau.icon}</a>
+                            )
+                        })}
                     </div>
                 </div>
                 {/* <AppModal>

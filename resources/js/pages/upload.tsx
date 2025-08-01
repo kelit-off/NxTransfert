@@ -150,7 +150,7 @@ export default function Upload() {
                             </p>
                         </div>
                     ) : urlDownload != null ? (
-                        <div className="min-w-md max-w-md px-5 py-4">
+                        <div className="md:min-w-md max-w-md px-5 py-4">
                             {/* Icon */}
                             <div className="flex flex-1 justify-center items-center mb-6">
                                 <img className="rounded-full w-[140px]" src="\asset\svg\success.svg" alt="Image de fusée pour montré le succès de l'envoie" />
@@ -171,13 +171,13 @@ export default function Upload() {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex flex-row flex-1 min-w-3xl h-[547px] px-5">
+                        <div className="flex flex-col md:flex-row flex-1 md:min-w-3xl h-[547px] px-5">
                             <div className="flex flex-col flex-1 py-3">
                                 {/* Tout les fichier */}
                                 <div className="w-full">
                                     <p className="" >{ files.length } fichier{ files.length > 1 ? "s" : ""} téléchargé{ files.length > 1 ? "s" : ""}</p>
                                 </div>
-                                <div className="scroll flex flex-col h-9/12 overflow-y-auto p-3 bg-gray-200 rounded-md mt-5">
+                                <div className="scroll flex flex-col h-12/12 md:h-9/12 overflow-y-auto p-3 bg-gray-200 rounded-md mt-5">
                                     {/* Les fichiers */}
                                     {files.map((file, index) => {
                                         return (
@@ -195,7 +195,7 @@ export default function Upload() {
                                         )
                                     })}
                                 </div>
-                                <div className="flex flex-row justify-left py-5">
+                                <div className="flex flex-row justify-left py-2 md:py-5">
                                     {/* Ajouter des fichier ou dossier*/}
                                     <label htmlFor="additional_file_input" className="cursor-pointer size-12 bg-green-400 hover:bg-green-500 rounded-xl flex justify-center items-center mr-3">
                                         <img className="w-[25px] h-auto" src="/asset/svg/icon-plus.svg" alt="" />
@@ -210,7 +210,7 @@ export default function Upload() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col flex-1 px-5 py-10">
+                            <div className="flex flex-col md:flex-1 px-5 py-2 md:py-10">
                                 {/* Information sur l'envoie */}
                                 {/* <div className="flex flex-row">
                                     <button>
@@ -220,10 +220,10 @@ export default function Upload() {
 
                                     </button>
                                 </div> */}
-                                <div className="flex flex-col flex-1">
-                                    <textarea className="border rounded py-0.5 px-1 h-44" name="" id="" placeholder="Votre message" onChange={changeMessage}></textarea>
+                                <div className="flex flex-col md:flex-1">
+                                    <textarea className="border rounded py-0.5 px-1 h-30 md:h-44" name="" id="" placeholder="Votre message" onChange={changeMessage}></textarea>
                                 </div>
-                                <button className="bg-green-400 rounded text-white cursor-pointer mt-10 h-9 disabled:bg-green-400/10 disabled:cursor-default" onClick={handleUpload} disabled={loading}>
+                                <button className="bg-green-400 rounded text-white cursor-pointer mt-5 md:mt-10 h-9 disabled:bg-green-400/10 disabled:cursor-default" onClick={handleUpload} disabled={loading}>
                                     Transférer
                                 </button>
                             </div>
