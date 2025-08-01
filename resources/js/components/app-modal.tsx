@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 export default function AppModal({children, addButton}) {
-    const [show, setShow] = useState(true)
+    const [show, setShow] = useState(false)
 
     const closeModal = () => setShow(false)
     return (

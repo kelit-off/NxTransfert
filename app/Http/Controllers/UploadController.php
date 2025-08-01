@@ -21,7 +21,7 @@ class UploadController extends Controller
             'files' => 'required|array'
         ]);
 
-        $expiration_date = now()->addDay(14)->format('Y-m-d\TH:i:s\Z');
+        $expiration_date = now()->addDay(14)->format('Y-m-d H:i:s');
         $token = Str::uuid();
 
         $zip = new ZipArchive();
