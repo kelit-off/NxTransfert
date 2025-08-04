@@ -130,7 +130,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
                         <div>
                             <h1 className="text-base font-semibold">L'alternative à WeTransfer français</h1>
                             <div className="space-x-2">
-                                <a className="cursor-pointer" href="#" onClick={() => setShowModal(true)}>Partager <span className='underline'>vos idées</span> avec nous</a>
+                                <a className="cursor-pointer" href="#" onClick={() => setShowModal(true)}>Partagez <span className='underline'>vos idées</span> avec nous</a>
                                 {/* <a className="cursor-pointer" href="#">ou <span className='underline'>votre satisfaction</span></a> */}
                             </div>
                         </div>

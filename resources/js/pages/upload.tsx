@@ -44,7 +44,8 @@ export default function Upload() {
     }
 
     const removeFile = (index) => {
-        
+        const newFiles = files.filter((_, i) => i != index);
+        setFiles(newFiles)
     }
 
     const changeMessage = (e) => {
@@ -188,7 +189,7 @@ export default function Upload() {
                                                         <span className="text-sm">{file.name}</span>
                                                     </div>
                                                 </div>
-                                                <button className="cursor-pointer" onClick={removeFile(index)}>
+                                                <button className="cursor-pointer" onClick={() => removeFile(index)}>
                                                     <X />
                                                 </button>
                                             </div>
