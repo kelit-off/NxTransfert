@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import AppModal from './app-modal';
 import { FaDiscord } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
+import axios from 'axios';
+import AppPopup from './app-popup';
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -37,6 +39,10 @@ const nosReseau = [
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
     const [backgroundImage, setBackgroundImage] = useState("")
+    const [messageidee, setMessageIdee] = useState("")
+    const [showError, setShowError] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [showModal, setShowModal] = useState(true)
 
 
     const preloadImage = (src) =>
@@ -63,9 +69,33 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
         return () => clearInterval(interval);
     }, [backgroundImages]);
 
+    const changeMessageIdee = (e) => {
+        setMessageIdee(e.target.value)
+    }
+
     const handleIdee = () => {
 
+        const formData = new FormData()
+        formData.append('idee', messageidee)
+
+
+        setShowSuccess(true)
+        closeModal
+        axios.post('/api/idee', formData)
+        .catch(function(error) {
+            console.log(error)
+            setShowError(true)
+            setShowSuccess(false)
+        })
     }
+
+    const openModal = () => {
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
 
     if (variant === 'header') {
         return (
@@ -80,12 +110,14 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
                         })}
                     </div>
                 </div>
-                <AppModal addButton={
+                <AppPopup background={'bg-green-400'} message={"Suggestion d'idée envoye"} show={showSuccess} onClose={() => setShowSuccess(false)}/>
+                <AppPopup background={'bg-red-400'} message={"Une erreur est survenue lors de l'envoie"} show={showError} onClose={() => setShowError(false)}/>
+                <AppModal show={showModal} onClose={closeModal} addButton={
                     <button className='cursor-pointer' onClick={handleIdee}><IoSend /></button>
                 }>
-                    <div className='py-2 px-3'>
+                    <div className='py-2 px-3 flex-1'>
                         <h4>Partager vos idées</h4>
-                        <textarea name="" id=""></textarea>
+                        <textarea name="" id="" className='mt-1 h-9/12 w-full rounded border-1 focus:outline-0 px-1 py-0.5' onChange={changeMessageIdee} placeholder='Partager vos idées avec nous'></textarea>
                     </div>
                 </AppModal>
                 {/* Footer en bas de la page */}
