@@ -9,8 +9,12 @@ Route::get('/', [UploadController::class, "UploadPage"])->name('home');
 
 Route::get('/d/{token}', [DownloadController::class, 'DownloadPage']);
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('dashboard', function () {
+//         return Inertia::render('dashboard');
+//     })->name('dashboard');
+// });
+
+Route::prefix('admin')->group(function() {
+    require __DIR__ . '/admin.php';
 });
