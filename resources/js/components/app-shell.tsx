@@ -42,7 +42,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const [messageidee, setMessageIdee] = useState("")
     const [showError, setShowError] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
-    const [showModal, setShowModal] = useState(true)
+    const [showModal, setShowModal] = useState(false)
 
 
     const preloadImage = (src) =>
@@ -129,10 +129,10 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
                         {/* Langue, information général sur le projet */}
                         <div>
                             <h1 className="text-base font-semibold">L'alternative à WeTransfer français</h1>
-                            {/* <div className="space-x-2">
-                                <a className="cursor-pointer" href="#">Partager <span className='underline'>vos idées</span> avec nous</a>
-                                <a className="cursor-pointer" href="#">ou <span className='underline'>votre satisfaction</span></a>
-                            </div> */}
+                            <div className="space-x-2">
+                                <a className="cursor-pointer" href="#" onClick={() => setShowModal(true)}>Partager <span className='underline'>vos idées</span> avec nous</a>
+                                {/* <a className="cursor-pointer" href="#">ou <span className='underline'>votre satisfaction</span></a> */}
+                            </div>
                         </div>
                     </div>
                 </div>
