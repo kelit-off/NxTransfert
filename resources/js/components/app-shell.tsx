@@ -76,11 +76,11 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const handleIdee = () => {
 
         const formData = new FormData()
-        formData.append('idee', messageidee)
+        formData.append('contenue', messageidee)
 
 
         setShowSuccess(true)
-        closeModal
+        closeModal()
         axios.post('/api/idee', formData)
         .catch(function(error) {
             console.log(error)
