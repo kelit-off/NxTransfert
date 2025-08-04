@@ -1,9 +1,17 @@
 import { useState } from "react"
 
-export default function AppModal({children, addButton}) {
-    const [show, setShow] = useState(false)
+export default function AppModal({children, addButton, show, onClose}) {
 
-    const closeModal = () => setShow(false)
+    const closeModal = () => {
+        if(onClose) {
+            onClose()
+        }
+    }
+
+    if (!show) {
+        return null;
+    }
+
     return (
         <>  
             <div className={`flex flex-1 fixed h-screen w-screen bg-black/70 ${show ? "" : "hidden"}`} onClick={closeModal}>
