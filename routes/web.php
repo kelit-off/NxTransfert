@@ -8,7 +8,7 @@ use Inertia\Inertia;
 Route::get('/', [UploadController::class, "UploadPage"])->name('home');
 
 Route::get('/d/{token}', [DownloadController::class, 'DownloadPage']);
-Route::get('/dd/{token}', [DownloadController::class, 'downloadZip']);
+Route::get('/dd/{token}', [DownloadController::class, 'downloadZip'])->name('download.temp');
 
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     Route::get('dashboard', function () {
