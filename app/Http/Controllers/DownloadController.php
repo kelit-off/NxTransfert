@@ -31,10 +31,16 @@ class DownloadController extends Controller
             now()->addMinutes(10),
             ['ResponseContentDisposition' => 'attachment; filename="archive_'.date('Y-m-d').'.zip"']
         );
+        $filePath = $request->token . ".zip";
 
-        return response()->json([
-            'status' => "success",
-            'download_url' => $url
-        ]);
+        if (!Storage::disk('s3')->exists($filePath)) {
+            return response()->json(['status' => 'error', 'message' => 'File not found'], 404);
+        }
+
+        $stream = Storage::disk('s3')->readStream($filePath);
+
+        return response()->streamDownload(function() use ($stream) {
+            fpassthru($stream);
+        }, 'archive_'.date('Y-m-d').'.zip');
     }
 }
