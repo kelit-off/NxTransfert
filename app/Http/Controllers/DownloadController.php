@@ -47,7 +47,7 @@ class DownloadController extends Controller
         fclose($out);
 
         // Générer une URL de téléchargement Laravel
-        $downloadUrl = route('download.temp', ['file' => $fileName]);
+        $downloadUrl = url('/dd/' . $request->token); //route('download.temp', ['file' => $fileName]);
 
         return response()->json([
             'status' => 'success',
