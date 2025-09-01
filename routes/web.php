@@ -19,5 +19,3 @@ Route::get('/dd/{token}', [DownloadController::class, 'downloadZip']);
 Route::prefix('admin')->group(function() {
     require __DIR__ . '/admin.php';
 });
-
-R
