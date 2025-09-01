@@ -25,7 +25,7 @@ class UploadController extends Controller
         $token = Str::uuid();
 
         $zip = new ZipArchive();
-        $tempZipPath = tempnam(sys_get_temp_dir(), $token) . 'zip';
+        $tempZipPath = sys_get_temp_dir() . '/' . $token . '.zip';
 
         if ($zip->open($tempZipPath, ZipArchive::CREATE) !== true) {
             return response()->json(['error' => 'Impossible de créer le fichier ZIP'], 500);
