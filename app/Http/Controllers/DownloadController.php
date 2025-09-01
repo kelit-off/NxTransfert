@@ -56,16 +56,29 @@ class DownloadController extends Controller
     }
 
     public function downloadZip($token)
-    {
-        $fileName = $token . '.zip';
-        $localPath = storage_path('app/temp/' . $fileName);
+{
+    $fileName = $token . '.zip';
+    $localPath = storage_path('app/temp/' . $fileName);
 
-        // Copier depuis MinIO si nécessaire
+    // Créer le dossier temporaire si nécessaire
+    if (!file_exists(dirname($localPath))) {
+        mkdir(dirname($localPath), 0755, true);
+    }
+
+    // Copier depuis S3 si le fichier local n’existe pas
+    if (!file_exists($localPath)) {
+        if (!Storage::disk('s3')->exists($fileName)) {
+            abort(404, 'File not found on S3');
+        }
+
         $stream = Storage::disk('s3')->readStream($fileName);
         $out = fopen($localPath, 'w');
         stream_copy_to_stream($stream, $out);
         fclose($out);
-
-        return response()->download($localPath, 'archive_' . date('Y-m-d') . '.zip')->deleteFileAfterSend(true);
     }
+
+    // Télécharger et supprimer après envoi
+    return response()->download($localPath, 'archive_' . date('Y-m-d') . '.zip')
+                     ->deleteFileAfterSend(true);
+}
 }
