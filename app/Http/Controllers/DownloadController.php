@@ -54,4 +54,18 @@ class DownloadController extends Controller
             'download_url' => $downloadUrl
         ]);
     }
+
+    public function downloadZip($token)
+    {
+        $fileName = $token . '.zip';
+        $localPath = storage_path('app/temp/' . $fileName);
+
+        // Copier depuis MinIO si nécessaire
+        $stream = Storage::disk('s3')->readStream($fileName);
+        $out = fopen($localPath, 'w');
+        stream_copy_to_stream($stream, $out);
+        fclose($out);
+
+        return response()->download($localPath, 'archive_' . date('Y-m-d') . '.zip')->deleteFileAfterSend(true);
+    }
 }

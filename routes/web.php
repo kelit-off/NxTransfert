@@ -8,6 +8,7 @@ use Inertia\Inertia;
 Route::get('/', [UploadController::class, "UploadPage"])->name('home');
 
 Route::get('/d/{token}', [DownloadController::class, 'DownloadPage']);
+Route::get('/dd/{token}', [DownloadController::class, 'downloadZip']);
 
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     Route::get('dashboard', function () {
@@ -18,3 +19,5 @@ Route::get('/d/{token}', [DownloadController::class, 'DownloadPage']);
 Route::prefix('admin')->group(function() {
     require __DIR__ . '/admin.php';
 });
+
+R

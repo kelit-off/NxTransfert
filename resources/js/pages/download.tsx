@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function Download() {
     const { files, message, token } = usePage<SharedData>().props
     const [isDownload, setIsDownload] = useState(false)
-    
+
     console.log(message)
     const handleDownload = async (e) => {
         setIsDownload(true)
@@ -17,17 +17,23 @@ export default function Download() {
         formData.append("token", token)
 
         axios.post('/api/download', formData)
-        .then(function(reponse) {
-            if(reponse.data.status == "success") {
-                const a = document.createElement("a")
-                a.href = reponse.data.download_url
-                a.download = "archive_"+new Date().toISOString().split("T")[0]
-                document.body.appendChild(a)
-                a.click()
-                a.remove()
-                setIsDownload(false)
-            }
-        })
+            .then(function (reponse) {
+                if (reponse.data.status == "success") {
+                    const a = document.createElement("a")
+                    a.href = `/dd/${token}` // Laravel sert le fichier en HTTPS
+                    a.download = "archive_" + new Date().toISOString().split("T")[0] + ".zip"
+                    document.body.appendChild(a)
+                    a.click()
+                    a.remove()
+                    // const a = document.createElement("a")
+                    // a.href = reponse.data.download_url
+                    // a.download = "archive_"+new Date().toISOString().split("T")[0]
+                    // document.body.appendChild(a)
+                    // a.click()
+                    // a.remove()
+                    setIsDownload(false)
+                }
+            })
     }
 
     return (
