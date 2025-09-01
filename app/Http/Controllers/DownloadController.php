@@ -9,7 +9,8 @@ use Inertia\Inertia;
 
 class DownloadController extends Controller
 {
-    public function DownloadPage($token) {
+    public function DownloadPage($token)
+    {
         $TransferInfo = Transfer::where('token', $token)->firstOrFail();
 
         return Inertia::render('download', [
@@ -19,28 +20,38 @@ class DownloadController extends Controller
         ]);
     }
 
-    public function DownloadPost(Request $request) {
+    public function DownloadPost(Request $request)
+    {
         $request->validate([
             "token" => "required|uuid"
         ]);
 
         $transfer = Transfer::where('token', $request->token)->firstOrFail();
+        $fileName = $request->token . ".zip";
 
-        $url = Storage::disk("s3")->temporaryUrl(
-            $request->token.".zip",
-            now()->addMinutes(10),
-            ['ResponseContentDisposition' => 'attachment; filename="archive_'.date('Y-m-d').'.zip"']
-        );
-        $filePath = $request->token . ".zip";
-
-        if (!Storage::disk('s3')->exists($filePath)) {
+        // Vérifier que le fichier existe sur S3
+        if (!Storage::disk('s3')->exists($fileName)) {
             return response()->json(['status' => 'error', 'message' => 'File not found'], 404);
         }
 
-        $stream = Storage::disk('s3')->readStream($filePath);
+        // Chemin temporaire local
+        $localPath = storage_path('app/temp/' . $fileName);
+        if (!file_exists(dirname($localPath))) {
+            mkdir(dirname($localPath), 0755, true);
+        }
 
-        return response()->streamDownload(function() use ($stream) {
-            fpassthru($stream);
-        }, 'archive_'.date('Y-m-d').'.zip');
+        // Copier le fichier S3 vers le local (en streaming pour ne pas saturer la RAM)
+        $stream = Storage::disk('s3')->readStream($fileName);
+        $out = fopen($localPath, 'w');
+        stream_copy_to_stream($stream, $out);
+        fclose($out);
+
+        // Générer une URL de téléchargement Laravel
+        $downloadUrl = route('download.temp', ['file' => $fileName]);
+
+        return response()->json([
+            'status' => 'success',
+            'download_url' => $downloadUrl
+        ]);
     }
 }
