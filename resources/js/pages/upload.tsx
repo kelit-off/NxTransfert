@@ -176,13 +176,13 @@ export default function Upload() {
                             <div className="flex flex-col flex-1 py-3">
                                 {/* Tout les fichier */}
                                 <div className="w-full">
-                                    <p className="" >{ files.length } fichier{ files.length > 1 ? "s" : ""} téléchargé{ files.length > 1 ? "s" : ""}</p>
+                                    <p className="text-gray-600" >{ files.length } fichier{ files.length > 1 ? "s" : ""} téléchargé{ files.length > 1 ? "s" : ""}</p>
                                 </div>
                                 <div className="scroll flex flex-col h-12/12 md:h-9/12 overflow-y-auto p-3 bg-gray-200 rounded-md mt-5">
                                     {/* Les fichiers */}
                                     {files.map((file, index) => {
                                         return (
-                                            <div key={index} className="flex flex-row justify-between px-5">
+                                            <div key={index} className="flex flex-row justify-between px-5 text-gray-600">
                                                 <div className="flex flex-row">
                                                     <FileIcon />
                                                     <div className="ml-2">
