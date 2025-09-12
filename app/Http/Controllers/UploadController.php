@@ -21,7 +21,6 @@ class UploadController extends Controller
         $request->validate([
             'message' => 'nullable|string',
             'files' => 'required|array',
-            'files.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:10240'
         ]);
 
         $expiration_date = now()->addDay(14)->format('Y-m-d H:i:s');
