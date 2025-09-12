@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transfer;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use ZipArchive;
@@ -21,6 +22,7 @@ class UploadController extends Controller
         $request->validate([
             'message' => 'nullable|string',
             'files' => 'required|array',
+            'files.*' => 'file|max:51200',
         ]);
 
         $expiration_date = now()->addDay(14)->format('Y-m-d H:i:s');
@@ -35,7 +37,14 @@ class UploadController extends Controller
 
         $filesList = [];
         foreach ($request->file('files') as $file) {
+            Log::info('Fichier reçu : ' . $file->getClientOriginalName());
+            Log::info('Mime type : ' . $file->getMimeType());
+            Log::info('Taille : ' . $file->getSize());
+            Log::info('Chemin réel : ' . $file->getRealPath());
+            Log::info('Chemin temporaire : ' . $file->getPathname());
+            Log::info('Extension : ' . $file->getClientOriginalExtension());
             if (!$file->isValid()) {
+                Log::error("Fichier mal upload");
                 continue;
             }
             $originalName = $file->getClientOriginalName();
