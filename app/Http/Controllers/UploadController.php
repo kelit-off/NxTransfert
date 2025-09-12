@@ -17,6 +17,94 @@ class UploadController extends Controller
         return Inertia::render("upload");
     }
 
+    /**
+     * Upload d'un gros fichier vers S3 en utilisant le multipart upload
+     */
+    private function uploadLargeFile($filePath, $s3Key)
+    {
+        try {
+            $s3Client = Storage::disk('s3')->getAdapter()->getClient();
+            $bucket = config('filesystems.disks.s3.bucket');
+            
+            Log::info('Début du multipart upload pour: ' . $s3Key);
+            
+            // Initier le multipart upload
+            $result = $s3Client->createMultipartUpload([
+                'Bucket' => $bucket,
+                'Key' => $s3Key,
+            ]);
+            
+            $uploadId = $result['UploadId'];
+            Log::info('Multipart upload ID: ' . $uploadId);
+            
+            // Lire le fichier par chunks de 5MB
+            $chunkSize = 5 * 1024 * 1024; // 5MB
+            $file = fopen($filePath, 'r');
+            $parts = [];
+            $partNumber = 1;
+            
+            while (!feof($file)) {
+                $chunk = fread($file, $chunkSize);
+                
+                if (strlen($chunk) === 0) {
+                    break;
+                }
+                
+                Log::info('Upload de la partie ' . $partNumber . ' (' . strlen($chunk) . ' bytes)');
+                
+                $partResult = $s3Client->uploadPart([
+                    'Bucket' => $bucket,
+                    'Key' => $s3Key,
+                    'UploadId' => $uploadId,
+                    'PartNumber' => $partNumber,
+                    'Body' => $chunk,
+                ]);
+                
+                $parts[] = [
+                    'ETag' => $partResult['ETag'],
+                    'PartNumber' => $partNumber,
+                ];
+                
+                $partNumber++;
+            }
+            
+            fclose($file);
+            
+            // Finaliser le multipart upload
+            Log::info('Finalisation du multipart upload avec ' . count($parts) . ' parties');
+            
+            $s3Client->completeMultipartUpload([
+                'Bucket' => $bucket,
+                'Key' => $s3Key,
+                'UploadId' => $uploadId,
+                'MultipartUpload' => [
+                    'Parts' => $parts,
+                ],
+            ]);
+            
+            Log::info('Multipart upload terminé avec succès');
+            return true;
+            
+        } catch (\Exception $e) {
+            Log::error('Erreur multipart upload: ' . $e->getMessage());
+            
+            // Nettoyer en cas d'erreur
+            if (isset($uploadId)) {
+                try {
+                    $s3Client->abortMultipartUpload([
+                        'Bucket' => $bucket,
+                        'Key' => $s3Key,
+                        'UploadId' => $uploadId,
+                    ]);
+                } catch (\Exception $cleanupError) {
+                    Log::error('Erreur cleanup multipart: ' . $cleanupError->getMessage());
+                }
+            }
+            
+            return false;
+        }
+    }
+
     public function UploadPost(Request $request)
     {
         // Log de début pour vérifier que la méthode est appelée
@@ -119,18 +207,8 @@ class UploadController extends Controller
             Log::info('Taille du contenu à uploader: ' . strlen($zipContents) . ' bytes');
             
             try {
-                // Augmenter les timeouts pour les gros fichiers
-                ini_set('max_execution_time', 300); // 5 minutes
-                
-                // Option alternative : utiliser putFileAs pour éviter de garder tout en mémoire
-                $s3Result = Storage::disk("s3")->put($token . ".zip", $zipContents, [
-                    'StorageClass' => 'STANDARD',
-                    'ServerSideEncryption' => 'AES256',
-                ]);
-                
+                $s3Result = Storage::disk("s3")->put($token . ".zip", $zipContents);
                 Log::info('Résultat S3 put: ' . ($s3Result ? 'true' : 'false'));
-                Log::info('Type de résultat: ' . gettype($s3Result));
-                Log::info('Contenu résultat: ' . var_export($s3Result, true));
                 
                 if (!$s3Result) {
                     Log::error('Storage::put a retourné false');
@@ -141,21 +219,13 @@ class UploadController extends Controller
                 $exists = Storage::disk("s3")->exists($token . ".zip");
                 Log::info('Fichier existe sur S3: ' . ($exists ? 'oui' : 'non'));
                 
-                if ($exists) {
-                    $s3Size = Storage::disk("s3")->size($token . ".zip");
-                    Log::info('Taille du fichier sur S3: ' . $s3Size . ' bytes');
-                    
-                    if ($s3Size !== strlen($zipContents)) {
-                        Log::warning('Différence de taille - Local: ' . strlen($zipContents) . ', S3: ' . $s3Size);
-                    }
-                } else {
+                if (!$exists) {
                     Log::error('Le fichier n\'existe pas sur S3 après upload');
                     return response()->json(['error' => 'Fichier non trouvé sur S3 après upload'], 500);
                 }
                 
             } catch (\Exception $s3Exception) {
                 Log::error('Exception S3: ' . $s3Exception->getMessage());
-                Log::error('Code erreur S3: ' . $s3Exception->getCode());
                 Log::error('S3 Stack trace: ' . $s3Exception->getTraceAsString());
                 return response()->json(['error' => 'Erreur S3: ' . $s3Exception->getMessage()], 500);
             }
