@@ -59,7 +59,7 @@ class UploadController extends Controller
 
         return response()->json([
             "status" => "success",
-            "url" => env("APP_URL")."/d/". $token,
+            "url" => config("app.url")."/d/". $token,
             "date_expiration" => $expiration_date
         ]);
     }
