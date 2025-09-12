@@ -68,14 +68,14 @@ class UploadController extends Controller
 
                 // CORRECTION: Utiliser addFromString au lieu de addFile
                 $fileContent = file_get_contents($file->getRealPath());
-
+                
                 if ($fileContent === false) {
                     Log::error("Impossible de lire le fichier: " . $file->getClientOriginalName());
                     continue;
                 }
 
                 $addResult = $zip->addFromString($safeName, $fileContent);
-
+                
                 if (!$addResult) {
                     Log::error("Impossible d'ajouter le fichier au ZIP: " . $safeName);
                     continue;
@@ -115,11 +115,49 @@ class UploadController extends Controller
             }
 
             Log::info('Upload vers S3...');
-            $s3Result = Storage::disk("s3")->put($token . ".zip", $zipContents);
-
-            if (!$s3Result) {
-                Log::error('Échec de l\'upload vers S3');
-                return response()->json(['error' => 'Erreur lors de l\'upload vers S3'], 500);
+            Log::info('Nom du fichier S3: ' . $token . ".zip");
+            Log::info('Taille du contenu à uploader: ' . strlen($zipContents) . ' bytes');
+            
+            try {
+                // Augmenter les timeouts pour les gros fichiers
+                ini_set('max_execution_time', 300); // 5 minutes
+                
+                // Option alternative : utiliser putFileAs pour éviter de garder tout en mémoire
+                $s3Result = Storage::disk("s3")->put($token . ".zip", $zipContents, [
+                    'StorageClass' => 'STANDARD',
+                    'ServerSideEncryption' => 'AES256',
+                ]);
+                
+                Log::info('Résultat S3 put: ' . ($s3Result ? 'true' : 'false'));
+                Log::info('Type de résultat: ' . gettype($s3Result));
+                Log::info('Contenu résultat: ' . var_export($s3Result, true));
+                
+                if (!$s3Result) {
+                    Log::error('Storage::put a retourné false');
+                    return response()->json(['error' => 'Erreur lors de l\'upload vers S3'], 500);
+                }
+                
+                // Vérifier que le fichier existe sur S3
+                $exists = Storage::disk("s3")->exists($token . ".zip");
+                Log::info('Fichier existe sur S3: ' . ($exists ? 'oui' : 'non'));
+                
+                if ($exists) {
+                    $s3Size = Storage::disk("s3")->size($token . ".zip");
+                    Log::info('Taille du fichier sur S3: ' . $s3Size . ' bytes');
+                    
+                    if ($s3Size !== strlen($zipContents)) {
+                        Log::warning('Différence de taille - Local: ' . strlen($zipContents) . ', S3: ' . $s3Size);
+                    }
+                } else {
+                    Log::error('Le fichier n\'existe pas sur S3 après upload');
+                    return response()->json(['error' => 'Fichier non trouvé sur S3 après upload'], 500);
+                }
+                
+            } catch (\Exception $s3Exception) {
+                Log::error('Exception S3: ' . $s3Exception->getMessage());
+                Log::error('Code erreur S3: ' . $s3Exception->getCode());
+                Log::error('S3 Stack trace: ' . $s3Exception->getTraceAsString());
+                return response()->json(['error' => 'Erreur S3: ' . $s3Exception->getMessage()], 500);
             }
 
             Log::info('Upload S3 réussi');
@@ -145,16 +183,18 @@ class UploadController extends Controller
                 "url" => config("app.url") . "/d/" . $token,
                 "date_expiration" => $expiration_date
             ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Erreur de validation: ' . json_encode($e->errors()));
             return response()->json([
                 'error' => 'Erreur de validation',
                 'details' => $e->errors()
             ], 422);
+
         } catch (\Exception $e) {
             Log::error('ERREUR GÉNÉRALE UPLOAD: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-
+            
             return response()->json([
                 'error' => 'Erreur serveur: ' . $e->getMessage()
             ], 500);
