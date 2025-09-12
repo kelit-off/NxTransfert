@@ -11,14 +11,17 @@ use ZipArchive;
 
 class UploadController extends Controller
 {
-    public function UploadPage() {
+    public function UploadPage()
+    {
         return Inertia::render("upload");
     }
 
-    public function UploadPost(Request $request) {
+    public function UploadPost(Request $request)
+    {
         $request->validate([
             'message' => 'nullable|string',
-            'files' => 'required|array'
+            'files' => 'required|array',
+            'files.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:10240'
         ]);
 
         $expiration_date = now()->addDay(14)->format('Y-m-d H:i:s');
@@ -32,21 +35,28 @@ class UploadController extends Controller
         }
 
         $filesList = [];
-        foreach($request->file('files') as $file) {
-            $zip->addFile($file->getRealPath(), $file->getClientOriginalName());
-            $tempFile = [
-                'name' => $file->getClientOriginalName(),
+        foreach ($request->file('files') as $file) {
+            if (!$file->isValid()) {
+                continue;
+            }
+            $originalName = $file->getClientOriginalName();
+            $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME))
+                . '.' . $file->getClientOriginalExtension();
+
+            $zip->addFile($file->getRealPath(), $safeName);
+
+            $filesList[] = [
+                'name' => $safeName,
                 'size' => $file->getSize()
             ];
-            array_push($filesList, $tempFile);
         }
 
         $zip->close();
-        
+
 
         $zipContents = file_get_contents($tempZipPath);
 
-        Storage::disk("s3")->put($token.".zip", $zipContents);
+        Storage::disk("s3")->put($token . ".zip", $zipContents);
 
         unlink($tempZipPath);
 
@@ -59,7 +69,7 @@ class UploadController extends Controller
 
         return response()->json([
             "status" => "success",
-            "url" => config("app.url")."/d/". $token,
+            "url" => config("app.url") . "/d/" . $token,
             "date_expiration" => $expiration_date
         ]);
     }
